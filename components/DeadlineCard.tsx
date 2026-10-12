@@ -6,10 +6,10 @@ import { getDday, formatDday } from "@/lib/dday";
 type Props = {
   item: Deadline;
   onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
+  onEdit: (item: Deadline) => void;
 };
 
-export default function DeadlineCard({ item, onToggle, onDelete }: Props) {
+export default function DeadlineCard({ item, onToggle, onEdit }: Props) {
   const d = getDday(item.dueDate);
   const overdue = d < 0 && !item.done;
   const urgent = d <= 3 && !item.done;
@@ -34,36 +34,39 @@ export default function DeadlineCard({ item, onToggle, onDelete }: Props) {
         className="h-5 w-5 shrink-0 accent-blue-600"
       />
 
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium">
-            {item.subject}
-          </span>
-          <span>{item.type}</span>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => onEdit(item)}
+        onKeyDown={(e) => e.key === "Enter" && onEdit(item)}
+        aria-label={`${item.title} 수정`}
+        className="flex min-w-0 flex-1 cursor-pointer items-center gap-4"
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium">
+              {item.subject}
+            </span>
+            <span>{item.type}</span>
+          </div>
+          <p
+            className={`mt-1 truncate text-base font-semibold text-slate-900 ${
+              item.done ? "line-through" : ""
+            }`}
+          >
+            {item.title}
+          </p>
+          <p className="text-sm text-slate-500">{item.dueDate}</p>
         </div>
-        <p
-          className={`mt-1 truncate text-base font-semibold text-slate-900 ${
-            item.done ? "line-through" : ""
-          }`}
-        >
-          {item.title}
-        </p>
-        <p className="text-sm text-slate-500">{item.dueDate}</p>
-      </div>
 
-      <div className="flex flex-col items-end gap-1">
-        <span className={`text-2xl font-extrabold ${ddayColor}`}>
-          {formatDday(d)}
-        </span>
-        {overdue && (
-          <span className="text-xs font-medium text-red-600">기한 지남</span>
-        )}
-        <button
-          onClick={() => onDelete(item.id)}
-          className="text-xs text-slate-400 hover:text-red-500"
-        >
-          삭제
-        </button>
+        <div className="flex flex-col items-end">
+          <span className={`text-2xl font-extrabold ${ddayColor}`}>
+            {formatDday(d)}
+          </span>
+          {overdue && (
+            <span className="text-xs font-medium text-red-600">기한 지남</span>
+          )}
+        </div>
       </div>
     </li>
   );
