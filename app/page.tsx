@@ -53,6 +53,7 @@ export default function Home() {
   }, [open]);
 
   const canSubmit = title.trim() !== "" && dueDate !== "";
+  const hasItems = deadlines.length > 0;
 
   function resetForm() {
     setSubject("");
@@ -150,7 +151,7 @@ export default function Home() {
   if (week.length) parts.push(`이번 주 ${week.length}개`);
 
   let summary = "과제와 시험 마감, 더 이상 깜빡하지 마세요.";
-  if (loaded && deadlines.length > 0) {
+  if (loaded && hasItems) {
     if (active.length === 0) summary = "모든 마감을 끝냈어요 🎉";
     else if (parts.length > 0) summary = parts.join(" · ");
     else summary = `남은 마감 ${later.length}개`;
@@ -160,18 +161,21 @@ export default function Home() {
     "w-full rounded-lg border border-slate-300 bg-white p-2.5 text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none";
 
   return (
-    <main className="mx-auto max-w-xl px-5 py-10">
+    <main className="mx-auto max-w-xl px-5 pt-10 pb-28 sm:pb-10">
       <header className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900">마감 알리미</h1>
           <p className="mt-2 text-sm font-medium text-slate-500">{summary}</p>
         </div>
-        <button
-          onClick={openAdd}
-          className="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-        >
-          + 마감 추가
-        </button>
+        {/* PC: 헤더 오른쪽 버튼 / 모바일: 화면 아래 고정 버튼을 사용 */}
+        {hasItems && (
+          <button
+            onClick={openAdd}
+            className="hidden shrink-0 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:block"
+          >
+            + 마감 추가
+          </button>
+        )}
       </header>
 
       {sections
@@ -180,7 +184,7 @@ export default function Home() {
           <section key={s.key} className="mt-8">
             <h2 className={`mb-3 text-sm font-bold ${s.tone}`}>
               {s.label}{" "}
-              <span className="font-medium text-slate-400">{s.items.length}</span>
+              <span className="font-medium text-slate-500">{s.items.length}</span>
             </h2>
             <ul className="space-y-3">
               {s.items.map((item) => (
@@ -218,7 +222,7 @@ export default function Home() {
         </section>
       )}
 
-      {loaded && deadlines.length === 0 && (
+      {loaded && !hasItems && (
         <div className="mt-16 text-center">
           <p className="text-4xl">🗓</p>
           <p className="mt-4 text-lg font-bold text-slate-900">
@@ -234,6 +238,18 @@ export default function Home() {
             className="mt-6 rounded-full bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-500"
           >
             첫 마감 추가하기
+          </button>
+        </div>
+      )}
+
+      {/* 모바일 전용: 엄지가 닿는 화면 아래에 고정된 큰 추가 버튼 */}
+      {hasItems && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 p-4 sm:hidden">
+          <button
+            onClick={openAdd}
+            className="pointer-events-auto w-full rounded-2xl bg-blue-600 py-4 text-base font-bold text-white shadow-lg hover:bg-blue-500"
+          >
+            + 마감 추가
           </button>
         </div>
       )}
@@ -332,7 +348,7 @@ export default function Home() {
               <div>
                 <label className="text-sm font-semibold text-slate-700">
                   과목{" "}
-                  <span className="font-normal text-slate-400">(선택)</span>
+                  <span className="font-normal text-slate-500">(선택)</span>
                 </label>
                 <input
                   value={subject}
