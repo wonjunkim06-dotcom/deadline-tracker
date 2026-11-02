@@ -13,17 +13,19 @@ export default function DeadlineCard({ item, onToggle, onEdit }: Props) {
   const d = getDday(item.dueDate);
   const overdue = d < 0 && !item.done;
   const urgent = d <= 3 && !item.done;
+  // 과목을 입력하지 않았으면(기타) 칩을 숨겨서 카드마다 반복되지 않게 함
+  const hasSubject = item.subject.trim() !== "" && item.subject !== "기타";
 
   const ddayColor = item.done
-    ? "text-slate-400"
+    ? "text-slate-500"
     : urgent
     ? "text-red-600"
     : "text-blue-600";
 
   return (
     <li
-      className={`flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${
-        item.done ? "opacity-60" : ""
+      className={`flex items-center gap-4 rounded-2xl border border-slate-200 p-4 shadow-sm ${
+        item.done ? "bg-slate-50" : "bg-white"
       }`}
     >
       <input
@@ -44,14 +46,16 @@ export default function DeadlineCard({ item, onToggle, onEdit }: Props) {
       >
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium">
-              {item.subject}
-            </span>
+            {hasSubject && (
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+                {item.subject}
+              </span>
+            )}
             <span>{item.type}</span>
           </div>
           <p
-            className={`mt-1 truncate text-base font-semibold text-slate-900 ${
-              item.done ? "line-through" : ""
+            className={`mt-1 truncate text-base font-semibold ${
+              item.done ? "text-slate-600 line-through" : "text-slate-900"
             }`}
           >
             {item.title}
